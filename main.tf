@@ -5,9 +5,13 @@ terraform {
     hostname = "app.terraform.io"
 
     workspaces {
-      name = ["emmaapi"]
+      name = "emmaapi"
     }
   }
+}
+
+provider "azurerm" {
+  version = "~> 1.0"
 }
 
 resource "azurerm_resource_group" "funcexample" {
