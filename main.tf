@@ -1,49 +1,28 @@
-terraform {
-  cloud {
-    organization = "emmafoxorg"
-    ## Required for Terraform Enterprise; Defaults to app.terraform.io for Terraform Cloud
-    hostname = "app.terraform.io"
 
-    workspaces {
-      name = "emmaapi"
-    }
-  }
-}
+ # The configuration for the `remote` backend.
+     terraform {
+       backend "remote" {
+         # The name of your Terraform Cloud organization.
+         organization = "emmafoxorg"
 
-provider "azurerm" {
-  version = "~> 1.0"
-}
+         # The name of the Terraform Cloud workspace to store Terraform state files in.
+         workspaces {
+           name = "emmaapi"
+         }
+       }
+     }
 
-resource "azurerm_resource_group" "funcexample" {
-  name     = "azure-functions-cptest-rg"
+
+# 3. Create a resource group
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
   location = "West Europe"
 }
 
-resource "azurerm_storage_account" "funcexample" {
-  name                     = "zzzfunctionsapptestsa"
-  resource_group_name      = azurerm_resource_group.funcexample.name
-  location                 = azurerm_resource_group.funcexample.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-}
-
-resource "azurerm_app_service_plan" "example" {
-  name                = "azure-functions-test-service-plan"
-  location            = azurerm_resource_group.funcexample.location
-  resource_group_name = azurerm_resource_group.funcexample.name
-  kind                = "FunctionApp"
-
-  sku {
-    tier = "Dynamic"
-    size = "Y1"
-  }
-}
-
-resource "azurerm_function_app" "example" {
-  name                       = "test-azure-functions"
-  location                   = azurerm_resource_group.funcexample.location
-  resource_group_name        = azurerm_resource_group.funcexample.name
-  app_service_plan_id        = azurerm_app_service_plan.funcexample.id
-  storage_account_name       = azurerm_storage_account.funcexample.name
-  storage_account_access_key = azurerm_storage_account.funcexample.primary_access_key
+# 4. Create a virtual network within the resource group
+resource "azurerm_virtual_network" "example" {
+  name                = "example-network"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  address_space       = ["10.0.0.0/16"]
 }
